@@ -1,5 +1,4 @@
 package com.cmall.common.exception;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -45,14 +44,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(AccountAPIException.class)
-    public ResponseEntity<ErrorDetails> handleAccountAPIException(AccountAPIException exception,
-                                                                  WebRequest webRequest) {
+    @ExceptionHandler(ApiException.class)
+    public ResponseEntity<ErrorDetails> handleApiException(ApiException exception,
+                                                                        WebRequest webRequest) {
         ErrorDetails errorDetails = new ErrorDetails(new Date(), exception.getMessage(),
                 webRequest.getDescription(false));
 
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
+
+
 
     /**
      * Global exceptions handler

@@ -1,9 +1,11 @@
 package com.cmall.accountservice.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.util.Date;
 
+@Data
 @Entity
 @Table(name = "payment_methods")
 public class PaymentMethod {

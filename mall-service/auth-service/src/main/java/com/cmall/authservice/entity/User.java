@@ -2,6 +2,7 @@ package com.cmall.authservice.entity;
 
 
 
+
 import lombok.Data;
 
 

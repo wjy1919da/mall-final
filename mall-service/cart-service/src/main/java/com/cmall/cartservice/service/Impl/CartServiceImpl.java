@@ -3,10 +3,7 @@ package com.cmall.cartservice.service.Impl;
 import com.cmall.cartservice.dao.CartRepository;
 import com.cmall.cartservice.entity.Cart;
 import com.cmall.cartservice.feign.ItemClient;
-import com.cmall.cartservice.payload.CartDto;
-import com.cmall.cartservice.payload.CartItemDto;
-import com.cmall.cartservice.payload.ItemDto;
-import com.cmall.cartservice.payload.AddItemDto;
+import com.cmall.cartservice.payload.*;
 import com.cmall.cartservice.service.CartService;
 import com.cmall.common.exception.ApiException;
 import org.modelmapper.ModelMapper;
@@ -120,6 +117,34 @@ public class CartServiceImpl implements CartService {
         cart.setUpdatedAt(new Date());
 
         // Save and return the updated cart
+        return cartRepository.save(cart);
+    }
+
+    @Override
+    public Cart updateCart(UpdateCartDto updateCartDto) {
+        Cart cart = cartRepository.findById(updateCartDto.getCartId())
+                .orElseThrow(() -> new ApiException("Cart not found with ID: " + updateCartDto.getCartId(), HttpStatus.NOT_FOUND));
+
+        // 获取旧的购物车信息以用于计算价格
+        Map<String, Integer> oldItems = cart.getItems();
+        double totalPrice = 0;
+
+        // 更新购物车条目
+        Map<String, Integer> updatedItems = updateCartDto.getItems();
+        for (Map.Entry<String, Integer> entry : updatedItems.entrySet()) {
+            String itemId = entry.getKey();
+            Integer quantity = entry.getValue();
+
+            // 假设 getItemPrice 返回商品的当前价格
+            double itemPrice = itemClient.getItemById(itemId).getPrice();
+            totalPrice += itemPrice * quantity;
+        }
+
+        // 设置更新后的商品列表和总价
+        cart.setItems(updatedItems);
+        cart.setPrice(totalPrice);
+        cart.setUpdatedAt(new Date());
+
         return cartRepository.save(cart);
     }
 }

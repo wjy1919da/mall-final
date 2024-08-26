@@ -3,6 +3,7 @@ package com.cmall.cartservice.controller;
 import com.cmall.cartservice.entity.Cart;
 import com.cmall.cartservice.payload.AddItemDto;
 import com.cmall.cartservice.payload.CartDto;
+import com.cmall.cartservice.payload.UpdateCartDto;
 import com.cmall.cartservice.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -35,8 +36,10 @@ public class CartController {
         return ResponseEntity.ok(updatedCart);
     }
 
-
-
-
+    @PutMapping("/{userId}")
+    public ResponseEntity<Cart> updateCart(@PathVariable Integer userId, @RequestBody UpdateCartDto updateCartDto) {
+        Cart updatedCart = cartService.updateCart(updateCartDto);
+        return ResponseEntity.ok(updatedCart);
+    }
 
 }

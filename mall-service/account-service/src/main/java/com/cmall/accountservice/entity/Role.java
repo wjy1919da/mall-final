@@ -1,6 +1,7 @@
 package com.cmall.accountservice.entity;
 
-import jakarta.persistence.*;
+
+import javax.persistence.*;
 
 @Entity
 @Table(name = "roles")

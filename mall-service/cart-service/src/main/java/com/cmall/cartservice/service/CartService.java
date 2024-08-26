@@ -7,5 +7,6 @@ import com.cmall.cartservice.payload.CartDto;
 public interface CartService {
     Cart addItemToCart(Integer userId, AddItemDto item);
     CartDto getCartDetailsByUserId(Integer userId);
+    Cart removeItemFromCart(Integer userId, String itemId);
 
 }

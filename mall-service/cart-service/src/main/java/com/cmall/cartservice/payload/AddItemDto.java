@@ -1,6 +1,9 @@
 package com.cmall.cartservice.payload;
 
-public class addItemDto {
+import lombok.Data;
+
+@Data
+public class AddItemDto {
     private String itemId;
     private Integer itemCount;
 }

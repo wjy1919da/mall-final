@@ -1,7 +1,8 @@
 package com.cmall.cartservice.service;
 
-import com.cmall.cartservice.payload.addItemDto;
+import com.cmall.cartservice.entity.Cart;
+import com.cmall.cartservice.payload.AddItemDto;
 
 public interface CartService {
-//    public void addItemToCart(Integer userId, addItemDto item);
+    public Cart addItemToCart(Integer userId, AddItemDto item);
 }

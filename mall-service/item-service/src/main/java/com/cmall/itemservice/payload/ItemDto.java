@@ -1,6 +1,5 @@
 package com.cmall.itemservice.payload;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.util.Date;

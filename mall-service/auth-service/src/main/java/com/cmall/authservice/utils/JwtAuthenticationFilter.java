@@ -1,5 +1,9 @@
 package com.cmall.authservice.utils;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -8,10 +12,6 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -25,32 +25,37 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        // get JWT (token) from http request
+        // Extract JWT from the request header
         String token = getJWTfromRequest(request);
-        // validate token
-        if(StringUtils.hasText(token) && tokenProvider.validateToken(token)){
-            // get username from token
+
+        // Validate the token
+        if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
+            // Retrieve username from the token
             String username = tokenProvider.getUsernameFromJWT(token);
-            // load user associated with token
+
+            // Load user details associated with the token
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+
+            // Create authentication token
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                    userDetails, null, userDetails.getAuthorities()
-            );
+                    userDetails, null, userDetails.getAuthorities());
+
+            // Set details for current request authentication
             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            // set spring security
+
+            // Set the authentication into the SecurityContext
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         }
 
+        // Continue filter execution
         filterChain.doFilter(request, response);
     }
 
-    // Bearer <accessToken>
-    private String getJWTfromRequest(HttpServletRequest request){
+    private String getJWTfromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-        if(StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")){
-            return bearerToken.substring(7, bearerToken.length());
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
         }
         return null;
     }
-
 }

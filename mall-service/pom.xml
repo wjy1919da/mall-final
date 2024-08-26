@@ -19,6 +19,7 @@
         <module>item-service</module>
         <module>auth-service</module>
         <module>mall-common</module>
+        <module>discovery-server</module>
     </modules>
     <url/>
     <licenses>

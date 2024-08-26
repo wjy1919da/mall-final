@@ -1,2 +1,4 @@
-.idea/
+.idea
 .DS_Store
+.idea/
+!.mvn/wrapper/maven-wrapper.jar

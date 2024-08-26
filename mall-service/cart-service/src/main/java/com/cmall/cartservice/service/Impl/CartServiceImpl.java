@@ -50,9 +50,12 @@ public class CartServiceImpl implements CartService {
         // 重新计算购物车总价
         double newTotalPrice = cart.getItems().entrySet().stream()
                 .mapToDouble(entry -> {
-                    // 假设有一个方法来获取每个 itemId 的价格，这里使用 itemInfo.getPrice() 作为示例
-                    double pricePerItem = itemInfo.getPrice(); // 实际应用中，你可能需要根据 entry.getKey() 来动态获取价格
-                    return pricePerItem * entry.getValue();
+                    // 假设有一个方法来获取每个 itemId 的价格，这里我们假设通过 ItemClient 来获取每个商品的最新价格
+                    ItemDto currentInfo = itemClient.getItemById(entry.getKey()); // 动态获取每个商品的最新价格
+                    if (currentInfo == null) {
+                        throw new ApiException("Item information not found during price calculation", HttpStatus.NOT_FOUND);
+                    }
+                    return currentInfo.getPrice() * entry.getValue();
                 }).sum();
 
         // 更新购物车的价格和更新时间

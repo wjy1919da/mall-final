@@ -150,4 +150,38 @@ public class CartServiceImpl implements CartService {
 
         return cartRepository.save(cart);
     }
+
+    @Override
+    public Cart removeItemsFromCart(Integer userId, RemoveItemsDto removeItemsDto){
+        Cart cart = cartRepository.findByUserId(userId)
+                .orElseThrow(() -> new ApiException("Cart not found with user id " + userId, HttpStatus.NOT_FOUND));
+
+        boolean isUpdated = false;
+        for (String itemId : removeItemsDto.getItemIds()) {
+            if (cart.getItems().containsKey(itemId)) {
+                cart.getItems().remove(itemId);
+                isUpdated = true;
+            }
+        }
+
+        if (!isUpdated) {
+            throw new ApiException("None of the items found in the cart", HttpStatus.NOT_FOUND);
+        }
+
+        // Recalculate the total price
+        double totalPrice = 0.0;
+        for (Map.Entry<String, Integer> entry : cart.getItems().entrySet()) {
+            String key = entry.getKey();
+            Integer quantity = entry.getValue();
+            ItemDto item = itemClient.getItemById(key);
+            totalPrice += item.getPrice() * quantity;
+        }
+        cart.setPrice(totalPrice);
+
+        // Update the timestamp
+        cart.setUpdatedAt(new Date());
+
+        // Save and return the updated cart
+        return cartRepository.save(cart);
+    }
 }

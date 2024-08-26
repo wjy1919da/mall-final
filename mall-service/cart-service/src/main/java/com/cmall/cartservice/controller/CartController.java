@@ -3,6 +3,7 @@ package com.cmall.cartservice.controller;
 import com.cmall.cartservice.entity.Cart;
 import com.cmall.cartservice.payload.AddItemDto;
 import com.cmall.cartservice.payload.CartDto;
+import com.cmall.cartservice.payload.RemoveItemsDto;
 import com.cmall.cartservice.payload.UpdateCartDto;
 import com.cmall.cartservice.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,12 @@ public class CartController {
     @PutMapping("/{userId}")
     public ResponseEntity<Cart> updateCart(@PathVariable Integer userId, @RequestBody UpdateCartDto updateCartDto) {
         Cart updatedCart = cartService.updateCart(updateCartDto);
+        return ResponseEntity.ok(updatedCart);
+    }
+
+    @DeleteMapping("/{userId}/items")
+    public ResponseEntity<Cart> removeItemsFromCart(@PathVariable Integer userId, @RequestBody RemoveItemsDto removeItemsDto) {
+        Cart updatedCart = cartService.removeItemsFromCart(userId, removeItemsDto);
         return ResponseEntity.ok(updatedCart);
     }
 

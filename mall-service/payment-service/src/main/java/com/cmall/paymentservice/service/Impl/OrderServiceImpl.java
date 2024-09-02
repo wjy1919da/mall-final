@@ -9,19 +9,19 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class OrderServiceImpl {
-    @Autowired
-    private OrderRepository orderRepository;
-
-    @Autowired
-    ModelMapper modelMapper;
-
-    @Autowired
-    UserClient userClient;
-
-    @Override
-    public OrderDto createOrder(OrderDto orderDto){
-        Order order = new Order();
-        AccountDetailResponse userInfo = userClient.getUserDetails(orderDto.getUserId());
-
-    }
+//    @Autowired
+//    private OrderRepository orderRepository;
+//
+//    @Autowired
+//    ModelMapper modelMapper;
+//
+//    @Autowired
+//    UserClient userClient;
+//
+//    @Override
+//    public OrderDto createOrder(OrderDto orderDto){
+//        Order order = new Order();
+//        AccountDetailResponse userInfo = userClient.getUserDetails(orderDto.getUserId());
+//
+//    }
 }

@@ -1,4 +1,25 @@
-.idea
+# 忽略编译生成的文件
+*.class
+
+# 忽略 IDE 设置文件
+/.idea/
+/.vscode/
+
+# 忽略构建输出目录
+/target/
+/build/
+
+# 忽略包管理器配置文件
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+
+# 忽略日志文件和数据库文件
+*.log
+*.sql
+*.db
+
+# 忽略操作系统生成的文件
 .DS_Store
-.idea/
-!.mvn/wrapper/maven-wrapper.jar
+Thumbs.db

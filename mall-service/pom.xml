@@ -21,6 +21,8 @@
         <module>mall-common</module>
         <module>discovery-server</module>
         <module>cart-service</module>
+        <module>payment-service</module>
+        <module>api-gateway</module>
     </modules>
     <url/>
     <licenses>

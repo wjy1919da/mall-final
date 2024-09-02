@@ -5,6 +5,6 @@ import com.cmall.accountservice.payload.AccountDetailResponse;
 import com.cmall.accountservice.payload.AccountUpdateDto;
 
 public interface AccountService {
-    public User updateAccountInfo(User user, AccountUpdateDto accountUpdateDto);
-//    public AccountDetailResponse getUserDetails(User user);
+    public User updateAccountInfo(int userId, AccountUpdateDto accountUpdateDto);
+    public AccountDetailResponse getUserDetails(int userId);
 }

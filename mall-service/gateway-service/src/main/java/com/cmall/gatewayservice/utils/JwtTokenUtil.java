@@ -3,21 +3,36 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 import javax.crypto.SecretKey;
 import java.util.Base64;
 
+@Component
 public class JwtTokenUtil {
-    private final String jwtSecret;
+    @Value("${app.jwt-secret}")
+    private String jwtSecret;
     @Value("${app.jwt-expiration-milliseconds}")
     private int jwtExpirationInMs;
 
-    public JwtTokenUtil() {
-        SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS512); // 生成符合要求的密钥
-        this.jwtSecret = Base64.getEncoder().encodeToString(key.getEncoded()); // 将密钥编码为Base64字符串
+    public JwtTokenUtil() {}
+
+    /**
+     * get username from the token
+     * @param token
+     * @return
+     */
+    public String getUsernameFromJWT(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(jwtSecret)
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.getSubject();
     }
+
     /**
      * validate JWT token
      * @param token

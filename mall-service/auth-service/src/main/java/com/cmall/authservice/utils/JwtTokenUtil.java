@@ -14,14 +14,12 @@ import java.util.Date;
 
 @Component
 public class JwtTokenUtil {
-    private final String jwtSecret;
+    @Value("${app.jwt-secret}")
+    private String jwtSecret;
     @Value("${app.jwt-expiration-milliseconds}")
     private int jwtExpirationInMs;
 
-    public JwtTokenUtil() {
-        SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS512); // 生成符合要求的密钥
-        this.jwtSecret = Base64.getEncoder().encodeToString(key.getEncoded()); // 将密钥编码为Base64字符串
-    }
+    public JwtTokenUtil() {}
 
     /**
      * generate token
@@ -42,7 +40,7 @@ public class JwtTokenUtil {
                 .setSubject(email)  // 使用邮箱作为JWT的subject
                 .setIssuedAt(currentDate)
                 .setExpiration(expireDate)
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .signWith(SignatureAlgorithm.HS256, jwtSecret)
                 .compact();
 
         return token;

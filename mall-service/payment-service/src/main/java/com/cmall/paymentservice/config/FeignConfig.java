@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Import;
 
 @Configuration
 @EnableFeignClients
-@Import(ModelMapperConfig.class)
 public class FeignConfig {
 
 }

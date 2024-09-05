@@ -23,7 +23,7 @@ public class Order {
     private UUID orderId = UUID.randomUUID();
 
     @Column("user_id")
-    private UUID userId;
+    private int userId;
 
     @Column("items")
     private Map<String, Integer> items;

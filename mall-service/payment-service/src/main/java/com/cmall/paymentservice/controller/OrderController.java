@@ -1,5 +1,6 @@
 package com.cmall.paymentservice.controller;
 
+import com.cmall.paymentservice.entity.Order;
 import com.cmall.paymentservice.payload.OrderDto;
 import com.cmall.paymentservice.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +14,8 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping("/{userId}")
-    public ResponseEntity<OrderDto> createOrder(@PathVariable("userId") int userId){
-        OrderDto orderDto = orderService.createOrder(userId);
-        return ResponseEntity.ok(orderDto);
+    public ResponseEntity<?> createOrder(@PathVariable("userId") int userId){
+        Order order = orderService.createOrder(userId);
+        return ResponseEntity.ok(order);
     }
 }

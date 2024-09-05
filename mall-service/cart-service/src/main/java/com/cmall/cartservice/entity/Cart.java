@@ -15,7 +15,7 @@ public class Cart {
     @PrimaryKey
     private UUID cartId;
     private Integer userId;
-    private Map<String, Integer> items; // Item ID as key, quantity as value
+    private Map<String, Integer> items;
     private Double price;
     private Date updatedAt;
     private Date createdAt;

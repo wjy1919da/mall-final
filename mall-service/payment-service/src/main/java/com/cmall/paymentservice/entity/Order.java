@@ -9,13 +9,13 @@ import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
 @Data
 @Table("Orders")
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 public class Order {
     @PrimaryKey
@@ -31,14 +31,14 @@ public class Order {
     @Column("total_price")
     private Double price;
 
-    @Column("shipping_address_id")
-    private Integer shippingAddressId;
+    @Column("shipping_address")
+    private Map<String, String> shippingAddress;
 
-    @Column("billing_address_id")
-    private Integer billingAddressId;
+    @Column("billing_address")
+    private Map<String, String> billingAddress;
 
-    @Column("payment_method_id")
-    private Integer paymentMethodId;
+    @Column("payment_method")
+    private Map<String, String> paymentMethod;
 
     @Column("email")
     private String email;
@@ -47,5 +47,14 @@ public class Order {
     private String username;
 
     @Column("created_at")
-    private long createdAt;
+    private Date createdAt;
+
+    @Column("update_at")
+    private Date updateAt;
+
+    public Order(){
+        this.orderId = UUID.randomUUID();
+        this.createdAt = new Date();
+        this.updateAt = new Date();
+    }
 }

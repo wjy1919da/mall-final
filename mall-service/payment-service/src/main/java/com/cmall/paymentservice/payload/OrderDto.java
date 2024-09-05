@@ -8,12 +8,13 @@ import java.util.UUID;
 
 @Data
 public class OrderDto {
+    private UUID orderId;
     private Integer userId;
-    private Double totalPrice;
+    private Double price;
     private List<CartItemDto> items;
-    private Integer shippingAddressId;
-    private Integer billingAddressId;
-    private Integer paymentMethodId;
+    private AddressDto shippingAddress;
+    private AddressDto billingAddress;
+    private PaymentMethodDto paymentMethod;
     private String email;
     private String username;
 }

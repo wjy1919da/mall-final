@@ -27,6 +27,7 @@ public class CartController {
      * */
     @GetMapping("/{userId}")
     public ResponseEntity<CartDto> getCartByUserId(@PathVariable Integer userId) {
+        System.out.println("getCartByUserId is called");
         CartDto cartDto = cartService.getCartDetailsByUserId(userId);
         return ResponseEntity.ok(cartDto);
     }

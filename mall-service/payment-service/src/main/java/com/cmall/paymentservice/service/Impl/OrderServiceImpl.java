@@ -41,18 +41,14 @@ public class OrderServiceImpl implements OrderService {
         OrderDto orderDto = new OrderDto();
         modelMapper.map(userInfo, orderDto);
         modelMapper.map(cartInfo, orderDto);
-
-        Order order = new Order();
-        modelMapper.map(orderDto, order);
+        Order order = new Order(cartInfo.getTotalPrice(), userInfo.getEmail(), userInfo.getUsername(), cartInfo.getUserId());
         order.setItems(cartInfo.getItems().stream()
                 .collect(Collectors.toMap(CartItemDto::getItemId, CartItemDto::getQuantity)));
         order.setShippingAddress(addressToMap(orderDto.getShippingAddress()));
         order.setBillingAddress(addressToMap(orderDto.getBillingAddress()));
         order.setPaymentMethod(paymentMethodToMap(orderDto.getPaymentMethod()));
-        order.setPrice(cartInfo.getTotalPrice());
-
-
-        return order;
+        Order savedOrder = orderRepository.save(order);
+        return savedOrder;
     }
 
     private Map<String, String> addressToMap(AddressDto address) {

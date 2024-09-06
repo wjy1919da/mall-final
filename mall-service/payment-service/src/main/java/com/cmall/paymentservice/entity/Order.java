@@ -13,48 +13,53 @@ import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
+
 @Data
-@Table("Orders")
-@Builder
-@AllArgsConstructor
+@Table("orders")
 public class Order {
     @PrimaryKey
-    @Builder.Default
-    private UUID orderId = UUID.randomUUID();
+//    @Column("order_id")
+    private UUID orderId;
 
-    @Column("user_id")
+//    @Column("user_id")
     private int userId;
 
-    @Column("items")
+//    @Column("items")
     private Map<String, Integer> items;
 
-    @Column("total_price")
+//    @Column("price")
     private Double price;
 
-    @Column("shipping_address")
+//    @Column("shipping_address")
     private Map<String, String> shippingAddress;
 
-    @Column("billing_address")
+//    @Column("billing_address")
     private Map<String, String> billingAddress;
 
-    @Column("payment_method")
+//    @Column("payment_method")
     private Map<String, String> paymentMethod;
 
-    @Column("email")
+//    @Column("email")
     private String email;
 
-    @Column("username")
+//    @Column("username")
     private String username;
 
-    @Column("created_at")
+//    @Column("created_at")
     private Date createdAt;
 
-    @Column("update_at")
+//    @Column("update_at")
     private Date updateAt;
 
-    public Order(){
+    public Order(Double price, String email, String username, int userId) {
+        System.out.println("constructor is call!!");
         this.orderId = UUID.randomUUID();
+        System.out.println("orderId" + this.orderId);
         this.createdAt = new Date();
         this.updateAt = new Date();
+        this.price = price;
+        this.email = email;
+        this.username = username;
+        this.userId = userId;
     }
 }

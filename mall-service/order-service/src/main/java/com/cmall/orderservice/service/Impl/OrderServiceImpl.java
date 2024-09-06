@@ -7,17 +7,16 @@ import com.cmall.orderservice.service.OrderService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import reactor.core.publisher.Mono;
 
+@Transactional
 @Service
 public class OrderServiceImpl implements OrderService {
     @Autowired
@@ -37,6 +36,10 @@ public class OrderServiceImpl implements OrderService {
         return webClientBuilder.baseUrl("http://cart-service").build(); // Adjusted to match your Feign client's service ID
     }
 
+    private WebClient inventoryClient(){
+        return webClientBuilder.baseUrl("http://inventory-service").build();
+    }
+
     @Override
     public Mono<Order> createOrder(int userId) {
         Mono<AccountDetailResponse> userInfo = userClient().get()
@@ -49,7 +52,25 @@ public class OrderServiceImpl implements OrderService {
                 .retrieve()
                 .bodyToMono(CartDto.class);
 
-        return Mono.zip(userInfo, cartInfo, (user, cart) -> {
+        return Mono.zip(userInfo, cartInfo)
+                .flatMap(tuple -> {
+                    AccountDetailResponse user = tuple.getT1();
+                    CartDto cart = tuple.getT2();
+                    List<String> itemIds = cart.getItems().stream()
+                            .map(CartItemDto::getItemId)
+                            .collect(Collectors.toList());
+
+                    return checkInventory(itemIds)
+                            .map(inStock -> {
+                                if (inStock.contains(false)) {
+                                    throw new RuntimeException("One or more items are out of stock");
+                                }
+                                return tuple;
+                            });
+                })
+                .map(tuple -> {
+                    AccountDetailResponse user = tuple.getT1();
+                    CartDto cart = tuple.getT2();
                     OrderDto orderDto = new OrderDto();
                     modelMapper.map(user, orderDto);
                     modelMapper.map(cart, orderDto);
@@ -61,7 +82,17 @@ public class OrderServiceImpl implements OrderService {
                     order.setPaymentMethod(paymentMethodToMap(orderDto.getPaymentMethod()));
                     return order;
                 })
-                .flatMap(orderRepository::save);  // Directly use the reactive save method provided by ReactiveCassandraRepository
+                .flatMap(orderRepository::save);
+    }
+
+    private Mono<List<Boolean>> checkInventory(List<String> itemIds) {
+        return inventoryClient().post()
+                .uri("/api/inventory")
+                .bodyValue(itemIds)
+                .retrieve()
+                .bodyToFlux(InventoryResponse.class)
+                .map(InventoryResponse::isInStock)
+                .collectList();
     }
 
     private Map<String, String> addressToMap(AddressDto address) {

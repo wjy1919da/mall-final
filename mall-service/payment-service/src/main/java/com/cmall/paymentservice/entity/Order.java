@@ -51,15 +51,16 @@ public class Order {
 //    @Column("update_at")
     private Date updateAt;
 
-    public Order(Double price, String email, String username, int userId) {
-        System.out.println("constructor is call!!");
+    private int state;
+
+    public Order(Double price, String email, String username, int userId, int state) {
         this.orderId = UUID.randomUUID();
-        System.out.println("orderId" + this.orderId);
         this.createdAt = new Date();
         this.updateAt = new Date();
         this.price = price;
         this.email = email;
         this.username = username;
         this.userId = userId;
+        this.state = state;
     }
 }

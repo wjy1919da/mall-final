@@ -5,5 +5,6 @@ import com.cmall.paymentservice.payload.OrderDto;
 
 public interface OrderService {
     public Order createOrder(int userId);
+//    public Order getAllOrders(int userId);
 
 }

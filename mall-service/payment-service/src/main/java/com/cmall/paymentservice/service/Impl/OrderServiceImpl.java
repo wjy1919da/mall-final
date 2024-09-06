@@ -34,6 +34,7 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private CartClient cartClient;
 
+    // 0: order cancel 1:创建 2:completed 3: order paid
     @Override
     public Order createOrder(int userId){
         AccountDetailResponse userInfo = userClient.getUserDetails(userId);
@@ -41,7 +42,7 @@ public class OrderServiceImpl implements OrderService {
         OrderDto orderDto = new OrderDto();
         modelMapper.map(userInfo, orderDto);
         modelMapper.map(cartInfo, orderDto);
-        Order order = new Order(cartInfo.getTotalPrice(), userInfo.getEmail(), userInfo.getUsername(), cartInfo.getUserId());
+        Order order = new Order(cartInfo.getTotalPrice(), userInfo.getEmail(), userInfo.getUsername(), cartInfo.getUserId(), 1);
         order.setItems(cartInfo.getItems().stream()
                 .collect(Collectors.toMap(CartItemDto::getItemId, CartItemDto::getQuantity)));
         order.setShippingAddress(addressToMap(orderDto.getShippingAddress()));
@@ -50,6 +51,21 @@ public class OrderServiceImpl implements OrderService {
         Order savedOrder = orderRepository.save(order);
         return savedOrder;
     }
+
+//    @Override
+//    public Order getAllOrders(int userId){
+//
+//    }
+
+
+
+
+
+
+
+
+
+
 
     private Map<String, String> addressToMap(AddressDto address) {
         return Optional.ofNullable(address).map(a -> {

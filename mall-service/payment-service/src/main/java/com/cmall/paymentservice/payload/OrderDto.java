@@ -17,4 +17,5 @@ public class OrderDto {
     private PaymentMethodDto paymentMethod;
     private String email;
     private String username;
+    private int state;
 }

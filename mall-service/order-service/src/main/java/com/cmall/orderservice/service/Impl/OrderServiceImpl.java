@@ -1,17 +1,13 @@
-package com.cmall.paymentservice.service.Impl;
+package com.cmall.orderservice.service.Impl;
 
-import com.cmall.common.exception.ApiException;
-import com.cmall.common.payload.AccountDetailResponse;
-import com.cmall.paymentservice.dao.OrderRepository;
-import com.cmall.paymentservice.entity.Order;
-import com.cmall.paymentservice.feign.CartClient;
-import com.cmall.paymentservice.feign.UserClient;
-import com.cmall.paymentservice.payload.*;
-import com.cmall.paymentservice.service.OrderService;
+import com.cmall.orderservice.dao.OrderRepository;
+import com.cmall.orderservice.entity.Order;
+import com.cmall.orderservice.payload.*;
+import com.cmall.orderservice.service.OrderService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -19,6 +15,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import reactor.core.publisher.Mono;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -29,29 +27,42 @@ public class OrderServiceImpl implements OrderService {
     private ModelMapper modelMapper;
 
     @Autowired
-    private UserClient userClient;
+    private WebClient.Builder webClientBuilder;
 
-    @Autowired
-    private CartClient cartClient;
-
-    // 0: order cancel 1:创建 2:completed 3: order paid
-    @Override
-    public Order createOrder(int userId){
-        AccountDetailResponse userInfo = userClient.getUserDetails(userId);
-        CartDto cartInfo = cartClient.getCartByUserId(userId);
-        OrderDto orderDto = new OrderDto();
-        modelMapper.map(userInfo, orderDto);
-        modelMapper.map(cartInfo, orderDto);
-        Order order = new Order(cartInfo.getTotalPrice(), userInfo.getEmail(), userInfo.getUsername(), cartInfo.getUserId(), 1);
-        order.setItems(cartInfo.getItems().stream()
-                .collect(Collectors.toMap(CartItemDto::getItemId, CartItemDto::getQuantity)));
-        order.setShippingAddress(addressToMap(orderDto.getShippingAddress()));
-        order.setBillingAddress(addressToMap(orderDto.getBillingAddress()));
-        order.setPaymentMethod(paymentMethodToMap(orderDto.getPaymentMethod()));
-        Order savedOrder = orderRepository.save(order);
-        return savedOrder;
+    private WebClient userClient() {
+        return webClientBuilder.baseUrl("http://account-service").build(); // Adjusted to match your Feign client's service ID
     }
 
+    private WebClient cartClient() {
+        return webClientBuilder.baseUrl("http://cart-service").build(); // Adjusted to match your Feign client's service ID
+    }
+
+    @Override
+    public Mono<Order> createOrder(int userId) {
+        Mono<AccountDetailResponse> userInfo = userClient().get()
+                .uri("/api/account/{id}", userId)
+                .retrieve()
+                .bodyToMono(AccountDetailResponse.class);
+
+        Mono<CartDto> cartInfo = cartClient().get()
+                .uri("/api/cart/{userId}", userId)
+                .retrieve()
+                .bodyToMono(CartDto.class);
+
+        return Mono.zip(userInfo, cartInfo, (user, cart) -> {
+                    OrderDto orderDto = new OrderDto();
+                    modelMapper.map(user, orderDto);
+                    modelMapper.map(cart, orderDto);
+                    Order order = new Order(cart.getTotalPrice(), user.getEmail(), user.getUsername(), cart.getUserId(), 1);
+                    order.setItems(cart.getItems().stream()
+                            .collect(Collectors.toMap(CartItemDto::getItemId, CartItemDto::getQuantity)));
+                    order.setShippingAddress(addressToMap(orderDto.getShippingAddress()));
+                    order.setBillingAddress(addressToMap(orderDto.getBillingAddress()));
+                    order.setPaymentMethod(paymentMethodToMap(orderDto.getPaymentMethod()));
+                    return order;
+                })
+                .flatMap(orderRepository::save);  // Directly use the reactive save method provided by ReactiveCassandraRepository
+    }
 
     private Map<String, String> addressToMap(AddressDto address) {
         return Optional.ofNullable(address).map(a -> {
@@ -100,4 +111,7 @@ public class OrderServiceImpl implements OrderService {
             return map;
         }).orElseThrow(() -> new IllegalArgumentException("Payment method data is missing"));
     }
+
+
+
 }

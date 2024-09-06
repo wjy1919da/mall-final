@@ -14,9 +14,9 @@ public class InventoryController {
     @Autowired
     private InventoryService inventoryService;
 
-    @GetMapping
+    @PostMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<InventoryResponse> isInStock(@RequestParam List<String> itemIds) {
+    public List<InventoryResponse> isInStock(@RequestBody List<String> itemIds) {
         return inventoryService.isInStock(itemIds);
     }
 

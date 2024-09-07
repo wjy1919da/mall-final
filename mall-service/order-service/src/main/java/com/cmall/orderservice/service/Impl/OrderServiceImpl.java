@@ -2,10 +2,13 @@ package com.cmall.orderservice.service.Impl;
 
 import com.cmall.orderservice.dao.OrderRepository;
 import com.cmall.orderservice.entity.Order;
+import com.cmall.orderservice.event.OrderPlacedEvent;
 import com.cmall.orderservice.payload.*;
 import com.cmall.orderservice.service.OrderService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaAdmin;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -27,6 +30,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private WebClient.Builder webClientBuilder;
+
+    @Autowired
+    private KafkaTemplate kafkaTemplate;
+    @Autowired
+    private KafkaAdmin kafkaAdmin;
 
     private WebClient userClient() {
         return webClientBuilder.baseUrl("http://account-service").build(); // Adjusted to match your Feign client's service ID
@@ -80,6 +88,7 @@ public class OrderServiceImpl implements OrderService {
                     order.setShippingAddress(addressToMap(orderDto.getShippingAddress()));
                     order.setBillingAddress(addressToMap(orderDto.getBillingAddress()));
                     order.setPaymentMethod(paymentMethodToMap(orderDto.getPaymentMethod()));
+                    kafkaTemplate.send("notificationTopic", new OrderPlacedEvent(order.getOrderId()));
                     return order;
                 })
                 .flatMap(orderRepository::save);

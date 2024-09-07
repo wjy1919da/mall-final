@@ -12,6 +12,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -35,6 +36,7 @@ public class OrderServiceImpl implements OrderService {
     private CartClient cartClient;
 
     // 0: order cancel 1:创建 2:completed 3: order paid
+    @Transactional
     @Override
     public Order createOrder(int userId){
         AccountDetailResponse userInfo = userClient.getUserDetails(userId);

@@ -33,8 +33,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private KafkaTemplate kafkaTemplate;
-    @Autowired
-    private KafkaAdmin kafkaAdmin;
+
 
     private WebClient userClient() {
         return webClientBuilder.baseUrl("http://account-service").build(); // Adjusted to match your Feign client's service ID
@@ -85,15 +84,21 @@ public class OrderServiceImpl implements OrderService {
                     Order order = new Order(cart.getTotalPrice(), user.getEmail(), user.getUsername(), cart.getUserId(), 1);
                     order.setItems(cart.getItems().stream()
                             .collect(Collectors.toMap(CartItemDto::getItemId, CartItemDto::getQuantity)));
+
                     order.setShippingAddress(addressToMap(orderDto.getShippingAddress()));
                     order.setBillingAddress(addressToMap(orderDto.getBillingAddress()));
                     order.setPaymentMethod(paymentMethodToMap(orderDto.getPaymentMethod()));
-                    kafkaTemplate.send("notificationTopic", new OrderPlacedEvent(order.getOrderId()));
+
+                    List<OrderPlacedEvent.Item> eventItems = cart.getItems().stream()
+                            .map(item -> new OrderPlacedEvent.Item(item.getItemId(), item.getQuantity()))
+                            .collect(Collectors.toList());
+
+                    OrderPlacedEvent event = new OrderPlacedEvent(order.getOrderId(), eventItems);
+                    kafkaTemplate.send("notificationTopic", event);
                     return order;
                 })
                 .flatMap(orderRepository::save);
     }
-
     private Mono<List<Boolean>> checkInventory(List<String> itemIds) {
         return inventoryClient().post()
                 .uri("/api/inventory")

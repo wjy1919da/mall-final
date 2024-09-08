@@ -5,12 +5,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.UUID;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderPlacedEvent {
-    private UUID orderId;
+public class InventoryUpdateEvent {
+    private String type;
     private List<Item> items;
 }

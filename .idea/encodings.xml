@@ -6,8 +6,12 @@
     <file url="file://$PROJECT_DIR$/mall-service/cart-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mall-service/discovery-server/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mall-service/gateway-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mall-service/inventory-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mall-service/item-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mall-service/mall-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mall-service/order-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mall-service/payment-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mall-service/push-notification/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mall-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mall-service/src/main/resources" charset="UTF-8" />
   </component>
